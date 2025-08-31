@@ -188,16 +188,18 @@ class ResolvedResponseFormat:
             if isinstance(obj_schema.get("properties"), dict):
                 props: dict[str, Any] = obj_schema["properties"]
                 required: set[str] = set(obj_schema.get("required", []))
-                result: dict[str, Any] = {} if not isinstance(obj, dict) else dict(obj)
+                # Build result in schema order to preserve field ordering for downstream struct types
+                input_obj: dict[str, Any] = obj if isinstance(obj, dict) else {}
+                ordered_result: dict[str, Any] = {}
                 for key, subschema in props.items():
-                    if key in result:
-                        result[key] = walk(subschema, result[key])
+                    if key in input_obj:
+                        ordered_result[key] = walk(subschema, input_obj[key])
                     else:
                         if "default" in subschema:
-                            result[key] = subschema["default"]
+                            ordered_result[key] = subschema["default"]
                         elif key not in required:
-                            result[key] = None
-                return result
+                            ordered_result[key] = None
+                return ordered_result
 
             # Array case
             items_schema = obj_schema.get("items")
