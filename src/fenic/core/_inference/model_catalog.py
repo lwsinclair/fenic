@@ -518,6 +518,7 @@ class ModelCatalog:
                 max_output_tokens=32_768,
                 max_temperature=2,
                 supports_profiles=False,
+                supports_pdf_parsing=True,
             ),
             snapshots=["gpt-4.1-2025-04-14"],
         )
@@ -534,6 +535,7 @@ class ModelCatalog:
                 max_temperature=2.0,
                 supports_reasoning=True,
                 supports_custom_temperature=False,
+                supports_pdf_parsing=True,
             ),
         )
 
@@ -548,6 +550,7 @@ class ModelCatalog:
                 max_output_tokens=65_536,
                 supports_reasoning=True,
                 supports_custom_temperature=False,
+                supports_pdf_parsing=True,
             ),
         )
 
@@ -563,6 +566,7 @@ class ModelCatalog:
                 max_temperature=2.0,
                 supports_reasoning=True,
                 supports_custom_temperature=False,
+                supports_pdf_parsing=True,
             ),
         )
 
@@ -578,6 +582,7 @@ class ModelCatalog:
                 max_temperature=2.0,
                 supports_reasoning=True,
                 supports_custom_temperature=False,
+                supports_pdf_parsing=True,
             ),
         )
 
@@ -592,6 +597,7 @@ class ModelCatalog:
                 max_output_tokens=100_000,
                 max_temperature=2.0,
                 supports_reasoning=True,
+                supports_pdf_parsing=True,
             ),
         )
 
