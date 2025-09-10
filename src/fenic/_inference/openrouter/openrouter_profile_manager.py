@@ -6,6 +6,7 @@ References:
 - Chat completion params: https://openrouter.ai/docs/api-reference/chat-completion
 - API overview (parameters): https://openrouter.ai/docs/api-reference/overview
 """
+
 from __future__ import annotations
 
 from typing import Any, Optional
@@ -33,6 +34,8 @@ class OpenRouterCompletionProfileConfiguration(BaseProfileConfiguration):
     @property
     def extra_body(self) -> dict[str, Any]:
         params: dict[str, Any] = {}
+        # Enable native usage accounting so we don't need a follow-up generation fetch
+        params["usage"] = {"include": True}
         # Map OpenRouter params into request body
         params["provider"] = {"require_parameters": True}
         if self.models:
@@ -65,14 +68,18 @@ class OpenRouterCompletionProfileConfiguration(BaseProfileConfiguration):
 
 
 class OpenRouterCompletionsProfileManager(
-    ProfileManager[ResolvedOpenRouterModelProfile, OpenRouterCompletionProfileConfiguration]
+    ProfileManager[
+        ResolvedOpenRouterModelProfile, OpenRouterCompletionProfileConfiguration
+    ]
 ):
     """Constructs processed OpenRouter profile configurations per model/profile."""
 
     def __init__(
         self,
         model_parameters: CompletionModelParameters,
-        profile_configurations: Optional[dict[str, OpenRouterCompletionProfileConfiguration]] = None,
+        profile_configurations: Optional[
+            dict[str, OpenRouterCompletionProfileConfiguration]
+        ] = None,
         default_profile_name: Optional[str] = None,
     ):
         self._model_parameters = model_parameters
@@ -86,7 +93,10 @@ class OpenRouterCompletionsProfileManager(
     ) -> OpenRouterCompletionProfileConfiguration:
         # Capability-based validation: only allow reasoning params if model supports reasoning
         if not self._model_parameters.supports_reasoning:
-            if profile.reasoning_effort is not None or profile.reasoning_max_tokens is not None:
+            if (
+                profile.reasoning_effort is not None
+                or profile.reasoning_max_tokens is not None
+            ):
                 # Drop unsupported reasoning fields to avoid invalid API parameters
                 profile = ResolvedOpenRouterModelProfile(
                     models=profile.models,
@@ -95,15 +105,11 @@ class OpenRouterCompletionsProfileManager(
         else:
             # If the model supports reasoning, but the profile doesn't have a reasoning effort or max tokens, set a default
             # reasoning effort to low, so users don't hit weird issues with max tokens being hit before any completion tokens are output.
-            if profile.reasoning_effort is None and profile.reasoning_max_tokens is None:
+            if (
+                profile.reasoning_effort is None
+                and profile.reasoning_max_tokens is None
+            ):
                 profile.reasoning_effort = "low"
-
-        # Ensure models is a list of strings if provided
-        if profile.models is not None:
-            try:
-                profile.models = [str(m) for m in profile.models]
-            except Exception:
-                profile.models = None
 
         return OpenRouterCompletionProfileConfiguration(
             models=profile.models,
@@ -116,15 +122,5 @@ class OpenRouterCompletionsProfileManager(
         return OpenRouterCompletionProfileConfiguration(
             provider=ResolvedOpenRouterProviderRouting(
                 sort="throughput",
-                quantizations=[
-                    "fp4",
-                    "fp6",
-                    "fp8",
-                    "fp16",
-                    "bf16",
-                    "fp32",
-                    "unknown",
-                ],
             )
         )
-

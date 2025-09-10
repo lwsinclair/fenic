@@ -32,15 +32,14 @@ class ResolvedModelAlias:
         name: The name of the model.
         profile: The optional name of a profile configuration to use for the model.
     """
+
     name: str
     profile: Optional[str] = None
-
 
 @dataclass
 class ResolvedClassDefinition:
     label: str
     description: Optional[str] = None
-
 
 @dataclass
 class ResolvedResponseFormat:
@@ -59,6 +58,7 @@ class ResolvedResponseFormat:
         prompt_schema_definition: The description of the schema that will be used in the prompt. Only generated if struct_type is generated.
 
     """
+
     raw_schema: Dict[str, Any]
     strict_schema: Dict[str, Any]
     schema_validator: Validator
@@ -95,6 +95,7 @@ class ResolvedResponseFormat:
         validator = cls._create_validator(strict_schema)
         prompt_schema_definition = convert_pydantic_model_to_key_descriptions(model)
         struct_type = convert_pydantic_type_to_custom_struct_type(model) if generate_struct_type else None
+
         return cls(
             raw_schema=raw_schema,
             strict_schema=strict_schema,

@@ -35,6 +35,7 @@ LANGUAGE_MODEL_NAME_ARG = "--language-model-name"
 EMBEDDING_MODEL_PROVIDER_ARG = "--embedding-model-provider"
 EMBEDDING_MODEL_NAME_ARG = "--embedding-model-name"
 
+
 class TestPath(Protocol):
     """Protocol for test paths that can be either local or S3."""
 
@@ -149,21 +150,33 @@ def pytest_addoption(parser):
         help="If set, will run reader tests that read from HuggingFace.",
     )
 
+
 @pytest.fixture
 def embedding_model_name_and_dimensions(local_session) -> Tuple[str, int]:
     """Returns the embedding model name and dimensions for the default embedding model."""
     embedding_model = local_session._session_state.get_embedding_model()
-    embedding_model_name = f"{embedding_model.model_provider.value}/{embedding_model.model}"
+    embedding_model_name = (
+        f"{embedding_model.model_provider.value}/{embedding_model.model}"
+    )
     embedding_dimensions = embedding_model.model_parameters.default_dimensions
     return embedding_model_name, embedding_dimensions
+
 
 @pytest.fixture
 def examples_session_config(app_name, request) -> SessionConfig:
     """Creates a test session config."""
-    language_model_provider = ModelProvider(request.config.getoption(LANGUAGE_MODEL_PROVIDER_ARG))
-    embedding_model_provider = ModelProvider(request.config.getoption(EMBEDDING_MODEL_PROVIDER_ARG))
-    language_model = configure_language_model(language_model_provider, request.config.getoption(LANGUAGE_MODEL_NAME_ARG))
-    embedding_model = configure_embedding_model(embedding_model_provider, request.config.getoption(EMBEDDING_MODEL_NAME_ARG))
+    language_model_provider = ModelProvider(
+        request.config.getoption(LANGUAGE_MODEL_PROVIDER_ARG)
+    )
+    embedding_model_provider = ModelProvider(
+        request.config.getoption(EMBEDDING_MODEL_PROVIDER_ARG)
+    )
+    language_model = configure_language_model(
+        language_model_provider, request.config.getoption(LANGUAGE_MODEL_NAME_ARG)
+    )
+    embedding_model = configure_embedding_model(
+        embedding_model_provider, request.config.getoption(EMBEDDING_MODEL_NAME_ARG)
+    )
 
     return SessionConfig(
         app_name=app_name,
@@ -179,9 +192,15 @@ def examples_session_config(app_name, request) -> SessionConfig:
 @pytest.fixture
 def multi_model_local_session_config(app_name, request) -> SessionConfig:
     """Creates a test session config."""
-    language_model_provider = ModelProvider(request.config.getoption(LANGUAGE_MODEL_PROVIDER_ARG))
-    embedding_model_provider = ModelProvider(request.config.getoption(EMBEDDING_MODEL_PROVIDER_ARG))
-    embedding_model = configure_embedding_model(embedding_model_provider, request.config.getoption(EMBEDDING_MODEL_NAME_ARG))
+    language_model_provider = ModelProvider(
+        request.config.getoption(LANGUAGE_MODEL_PROVIDER_ARG)
+    )
+    embedding_model_provider = ModelProvider(
+        request.config.getoption(EMBEDDING_MODEL_PROVIDER_ARG)
+    )
+    embedding_model = configure_embedding_model(
+        embedding_model_provider, request.config.getoption(EMBEDDING_MODEL_NAME_ARG)
+    )
     nano = OpenAILanguageModel(model_name="gpt-4.1-nano", rpm=250, tpm=50_000)
 
     # these limits are purposely low so we don't consume our entire project limit while running multiple tests in multiple branches
@@ -228,7 +247,9 @@ def multi_model_local_session_config(app_name, request) -> SessionConfig:
             ),
         }
     else:
-        raise ValueError(f"Unsupported language model provider: {language_model_provider}")
+        raise ValueError(
+            f"Unsupported language model provider: {language_model_provider}"
+        )
     return SessionConfig(
         app_name=app_name,
         semantic=SemanticConfig(
@@ -258,14 +279,27 @@ def local_session_config(app_name, request, monkeypatch) -> SessionConfig:
     Notes:
         We mock the api key validation to avoid the noticeable delay of validating our api key in every test.
     """
+
     async def mock_validate_provider_api_keys(providers: set[ModelProviderClass]):
         return
-    monkeypatch.setattr("fenic._backends.local.model_registry._validate_provider_api_keys", mock_validate_provider_api_keys)
 
-    language_model_provider = ModelProvider(request.config.getoption(LANGUAGE_MODEL_PROVIDER_ARG))
-    embedding_model_provider = ModelProvider(request.config.getoption(EMBEDDING_MODEL_PROVIDER_ARG))
-    language_model = configure_language_model(language_model_provider, request.config.getoption(LANGUAGE_MODEL_NAME_ARG))
-    embedding_model = configure_embedding_model(embedding_model_provider, request.config.getoption(EMBEDDING_MODEL_NAME_ARG))
+    monkeypatch.setattr(
+        "fenic._backends.local.model_registry._validate_provider_api_keys",
+        mock_validate_provider_api_keys,
+    )
+
+    language_model_provider = ModelProvider(
+        request.config.getoption(LANGUAGE_MODEL_PROVIDER_ARG)
+    )
+    embedding_model_provider = ModelProvider(
+        request.config.getoption(EMBEDDING_MODEL_PROVIDER_ARG)
+    )
+    language_model = configure_language_model(
+        language_model_provider, request.config.getoption(LANGUAGE_MODEL_NAME_ARG)
+    )
+    embedding_model = configure_embedding_model(
+        embedding_model_provider, request.config.getoption(EMBEDDING_MODEL_NAME_ARG)
+    )
     return SessionConfig(
         app_name=app_name,
         semantic=SemanticConfig(
@@ -279,7 +313,9 @@ def local_session_config(app_name, request, monkeypatch) -> SessionConfig:
     )
 
 
-def configure_language_model(model_provider: ModelProvider, model_name: str) -> LanguageModel:
+def configure_language_model(
+    model_provider: ModelProvider, model_name: str
+) -> LanguageModel:
     model_parameters = model_catalog.get_completion_model_parameters(
         model_provider, model_name
     )
@@ -291,10 +327,18 @@ def configure_language_model(model_provider: ModelProvider, model_name: str) -> 
                 rpm=500,
                 tpm=100_000,
                 profiles={
-                    "minimal": OpenAILanguageModel.Profile(reasoning_effort="minimal", verbosity="low"),
-                    "low": OpenAILanguageModel.Profile(reasoning_effort="low", verbosity="low"),
-                    "medium": OpenAILanguageModel.Profile(reasoning_effort="medium", verbosity="low"),
-                    "high": OpenAILanguageModel.Profile(reasoning_effort="high", verbosity="low"),
+                    "minimal": OpenAILanguageModel.Profile(
+                        reasoning_effort="minimal", verbosity="low"
+                    ),
+                    "low": OpenAILanguageModel.Profile(
+                        reasoning_effort="low", verbosity="low"
+                    ),
+                    "medium": OpenAILanguageModel.Profile(
+                        reasoning_effort="medium", verbosity="low"
+                    ),
+                    "high": OpenAILanguageModel.Profile(
+                        reasoning_effort="high", verbosity="low"
+                    ),
                 },
                 default_profile="minimal",
             )
@@ -326,7 +370,9 @@ def configure_language_model(model_provider: ModelProvider, model_name: str) -> 
                 profiles={
                     "thinking_disabled": AnthropicLanguageModel.Profile(),
                     "low": AnthropicLanguageModel.Profile(thinking_token_budget=1024),
-                    "medium": AnthropicLanguageModel.Profile(thinking_token_budget=4096),
+                    "medium": AnthropicLanguageModel.Profile(
+                        thinking_token_budget=4096
+                    ),
                     "high": AnthropicLanguageModel.Profile(thinking_token_budget=8192),
                 },
                 default_profile="low",
@@ -346,10 +392,18 @@ def configure_language_model(model_provider: ModelProvider, model_name: str) -> 
                 tpm=500_000,
                 profiles={
                     "thinking_disabled": GoogleDeveloperLanguageModel.Profile(),
-                    "auto": GoogleDeveloperLanguageModel.Profile(thinking_token_budget=-1),
-                    "low": GoogleDeveloperLanguageModel.Profile(thinking_token_budget=1024),
-                    "medium": GoogleDeveloperLanguageModel.Profile(thinking_token_budget=4096),
-                    "high": GoogleDeveloperLanguageModel.Profile(thinking_token_budget=8192),
+                    "auto": GoogleDeveloperLanguageModel.Profile(
+                        thinking_token_budget=-1
+                    ),
+                    "low": GoogleDeveloperLanguageModel.Profile(
+                        thinking_token_budget=1024
+                    ),
+                    "medium": GoogleDeveloperLanguageModel.Profile(
+                        thinking_token_budget=4096
+                    ),
+                    "high": GoogleDeveloperLanguageModel.Profile(
+                        thinking_token_budget=8192
+                    ),
                 },
                 default_profile="auto",
             )
@@ -368,9 +422,15 @@ def configure_language_model(model_provider: ModelProvider, model_name: str) -> 
                 profiles={
                     "thinking_disabled": GoogleVertexLanguageModel.Profile(),
                     "auto": GoogleVertexLanguageModel.Profile(thinking_token_budget=-1),
-                    "low": GoogleVertexLanguageModel.Profile(thinking_token_budget=1024),
-                    "medium": GoogleVertexLanguageModel.Profile(thinking_token_budget=4096),
-                    "high": GoogleVertexLanguageModel.Profile(thinking_token_budget=8192),
+                    "low": GoogleVertexLanguageModel.Profile(
+                        thinking_token_budget=1024
+                    ),
+                    "medium": GoogleVertexLanguageModel.Profile(
+                        thinking_token_budget=4096
+                    ),
+                    "high": GoogleVertexLanguageModel.Profile(
+                        thinking_token_budget=8192
+                    ),
                 },
                 default_profile="auto",
             )
@@ -396,16 +456,22 @@ def configure_language_model(model_provider: ModelProvider, model_name: str) -> 
         raise ValueError(f"Unsupported language model provider: {model_provider}")
     return language_model
 
-def configure_embedding_model(model_provider: ModelProvider, model_name: str) -> EmbeddingModel:
-    """ Configure an embedding model for the test session.
+
+def configure_embedding_model(
+    model_provider: ModelProvider, model_name: str
+) -> EmbeddingModel:
+    """Configure an embedding model for the test session.
 
     Note: Don't configure profiles that change dimension defaults, or it won't be consistent with embedding_model_name_and_dimensions
-    and test_embed.py will fail. """
+    and test_embed.py will fail."""
     if model_provider == ModelProvider.OPENAI:
         embedding_model = OpenAIEmbeddingModel(
             model_name=model_name, rpm=3000, tpm=1_000_000
         )
-    elif model_provider == ModelProvider.GOOGLE_DEVELOPER or model_provider == ModelProvider.GOOGLE_VERTEX:
+    elif (
+        model_provider == ModelProvider.GOOGLE_DEVELOPER
+        or model_provider == ModelProvider.GOOGLE_VERTEX
+    ):
         embedding_model = GoogleDeveloperEmbeddingModel(
             model_name=model_name, rpm=3000, tpm=1_000_000
         )
@@ -508,6 +574,7 @@ def large_text_df(local_session):
 
     return local_session.create_dataframe({"text": [pp_content, cap_content]})
 
+
 @pytest.fixture
 def temp_dir_with_test_files():
     """Create a temporary directory with test files."""
@@ -529,7 +596,7 @@ def temp_dir_with_test_files():
             "temp/temp_file.md",
             "backup.md.bak",
             "file.tmp",
-            "file_json.json"
+            "file_json.json",
         ]
 
         for file_name in test_files:
@@ -539,11 +606,14 @@ def temp_dir_with_test_files():
                 _save_md_file(file_path)
             elif file_name.endswith(".json"):
                 # TODO: Create a better sample json file.
-                file_path.write_text(json.dumps({"name": file_name, "content": "sample content"}))
+                file_path.write_text(
+                    json.dumps({"name": file_name, "content": "sample content"})
+                )
             else:
                 file_path.write_text(f"sample content for {file_name}")
 
         yield str(temp_path)
+
 
 @pytest.fixture
 def temp_dir_just_one_file():
@@ -553,6 +623,7 @@ def temp_dir_just_one_file():
         _save_md_file(temp_path / "file1.md")
 
         yield str(temp_path)
+
 
 def _save_md_file(file_path: Path):
     """Save a sample markdown file to the given path"""

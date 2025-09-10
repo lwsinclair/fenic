@@ -8,7 +8,6 @@ from typing import Any, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from fenic._inference.openrouter.openrouter_provider import OpenRouterModelProvider
 from fenic.core._inference.model_catalog import (
     AnthropicLanguageModelName,
     CohereEmbeddingModelName,
@@ -61,15 +60,16 @@ default_profiles_desc = """
         """
 
 GoogleEmbeddingTaskType = Literal[
-            "SEMANTIC_SIMILARITY",
-            "CLASSIFICATION",
-            "CLUSTERING",
-            "RETRIEVAL_DOCUMENT",
-            "RETRIEVAL_QUERY",
-            "CODE_RETRIEVAL_QUERY",
-            "QUESTION_ANSWERING",
-            "FACT_VERIFICATION"
+    "SEMANTIC_SIMILARITY",
+    "CLASSIFICATION",
+    "CLUSTERING",
+    "RETRIEVAL_DOCUMENT",
+    "RETRIEVAL_QUERY",
+    "CODE_RETRIEVAL_QUERY",
+    "QUESTION_ANSWERING",
+    "FACT_VERIFICATION",
 ]
+
 
 class GoogleDeveloperEmbeddingModel(BaseModel):
     """Configuration for Google Developer embedding models.
@@ -110,6 +110,7 @@ class GoogleDeveloperEmbeddingModel(BaseModel):
         )
         ```
     """
+
     model_name: GoogleDeveloperEmbeddingModelName
     model_provider: ModelProvider = Field(default=ModelProvider.GOOGLE_DEVELOPER)
     rpm: int = Field(..., gt=0, description="Requests per minute; must be > 0")
@@ -141,11 +142,11 @@ class GoogleDeveloperEmbeddingModel(BaseModel):
             profile = GoogleDeveloperEmbeddingModelConfig.Profile()
             ```
         """
-        model_config = ConfigDict(extra='forbid')
+
+        model_config = ConfigDict(extra="forbid")
 
         output_dimensionality: Optional[int] = Field(default=None, gt=0, le=3072, description="Dimensionality of the embedding created by this model")
         task_type: GoogleEmbeddingTaskType = Field(default="SEMANTIC_SIMILARITY", description="Type of the task")
-
 
 
 class GoogleDeveloperLanguageModel(BaseModel):
@@ -188,6 +189,7 @@ class GoogleDeveloperLanguageModel(BaseModel):
         )
         ```
     """
+
     model_name: GoogleDeveloperLanguageModelName
     rpm: int = Field(..., gt=0, description="Requests per minute; must be > 0")
     tpm: int = Field(..., gt=0, description="Tokens per minute; must be > 0")
@@ -230,11 +232,11 @@ class GoogleDeveloperLanguageModel(BaseModel):
             profile = GoogleDeveloperLanguageModel.Profile(thinking_token_budget=0)
             ```
         """
-        model_config = ConfigDict(extra='forbid')
 
-        thinking_token_budget: Optional[int] = Field(
-            default=None, description="The thinking budget in tokens.", ge=-1, lt=32768
-        )
+        model_config = ConfigDict(extra="forbid")
+
+        thinking_token_budget: Optional[int] = Field(default=None, description="The thinking budget in tokens.", ge=-1, lt=32768)
+
 
 class GoogleVertexEmbeddingModel(BaseModel):
     """Configuration for Google Vertex AI embedding models.
@@ -275,13 +277,17 @@ class GoogleVertexEmbeddingModel(BaseModel):
         )
         ```
     """
+
     model_name: GoogleVertexEmbeddingModelName
     model_provider: ModelProvider = Field(default=ModelProvider.GOOGLE_VERTEX)
     rpm: int = Field(..., gt=0, description="Requests per minute; must be > 0")
     tpm: int = Field(..., gt=0, description="Tokens per minute; must be > 0")
-    profiles: Optional[dict[str, Profile]] = Field(default=None, description=profiles_desc)
-    default_profile: Optional[str] = Field(default=None, description=default_profiles_desc)
-
+    profiles: Optional[dict[str, Profile]] = Field(
+        default=None, description=profiles_desc
+    )
+    default_profile: Optional[str] = Field(
+        default=None, description=default_profiles_desc
+    )
 
     class Profile(BaseModel):
         """Profile configurations for Google Vertex embedding models.
@@ -307,10 +313,11 @@ class GoogleVertexEmbeddingModel(BaseModel):
             profile = GoogleVertexEmbeddingModelConfig.Profile()
             ```
         """
-        model_config = ConfigDict(extra='forbid')
+        model_config = ConfigDict(extra="forbid")
 
         output_dimensionality: Optional[int] = Field(default=None, ge=768, le=3072, description="Dimensionality of the embedding created by this model")
         task_type: GoogleEmbeddingTaskType = Field(default="SEMANTIC_SIMILARITY", description="Type of the task")
+
 
 class GoogleVertexLanguageModel(BaseModel):
     """Configuration for Google Vertex AI models.
@@ -352,6 +359,7 @@ class GoogleVertexLanguageModel(BaseModel):
         )
         ```
     """
+
     model_name: GoogleVertexLanguageModelName
     rpm: int = Field(..., gt=0, description="Requests per minute; must be > 0")
     tpm: int = Field(..., gt=0, description="Tokens per minute; must be > 0")
@@ -394,11 +402,10 @@ class GoogleVertexLanguageModel(BaseModel):
             profile = GoogleVertexLanguageModel.Profile(thinking_token_budget=0)
             ```
         """
-        model_config = ConfigDict(extra='forbid')
+        model_config = ConfigDict(extra="forbid")
 
-        thinking_token_budget: Optional[int] = Field(
-            default=None, description="The thinking budget in tokens.", ge=-1, lt=32768
-        )
+        thinking_token_budget: Optional[int] = Field(default=None, description="The thinking budget in tokens.", ge=-1, lt=32768)
+
 
 class OpenAILanguageModel(BaseModel):
     """Configuration for OpenAI language models.
@@ -470,7 +477,9 @@ class OpenAILanguageModel(BaseModel):
         semantic.map(instruction="Construct a formal proof of the {hypothesis}.", model_alias=ModelAlias(name="o4", profile="thorough"))
         ```
     """
-    model_name: OpenAILanguageModelName = Field(..., description="The name of the OpenAI model to use")
+    model_name: OpenAILanguageModelName = Field(
+        ..., description="The name of the OpenAI model to use"
+    )
     rpm: int = Field(..., gt=0, description="Requests per minute; must be > 0")
     tpm: int = Field(..., gt=0, description="Tokens per minute; must be > 0")
     profiles: Optional[dict[str, Profile]] = Field(default=None, description=profiles_desc)
@@ -501,14 +510,11 @@ class OpenAILanguageModel(BaseModel):
             profile = OpenAILanguageModel.Profile(reasoning_effort="medium")
             ```
         """
-        model_config = ConfigDict(extra='forbid')
 
-        reasoning_effort: Optional[ReasoningEffort] = Field(
-            default=None, description="The reasoning effort level for the profile"
-        )
-        verbosity: Optional[Verbosity] = Field(
-            default=None, description="The verbosity level for the profile"
-        )
+        model_config = ConfigDict(extra="forbid")
+
+        reasoning_effort: Optional[ReasoningEffort] = Field(default=None, description="The reasoning effort level for the profile")
+        verbosity: Optional[Verbosity] = Field(default=None, description="The verbosity level for the profile")
 
 
 class OpenAIEmbeddingModel(BaseModel):
@@ -533,7 +539,9 @@ class OpenAIEmbeddingModel(BaseModel):
         )
         ```
     """
-    model_name: OpenAIEmbeddingModelName = Field(..., description="The name of the OpenAI embedding model to use")
+    model_name: OpenAIEmbeddingModelName = Field(
+        ..., description="The name of the OpenAI embedding model to use"
+    )
     rpm: int = Field(..., gt=0, description="Requests per minute; must be > 0")
     tpm: int = Field(..., gt=0, description="Tokens per minute; must be > 0")
 
@@ -629,21 +637,21 @@ class AnthropicLanguageModel(BaseModel):
             profile = AnthropicLanguageModel.Profile(thinking_token_budget=8192)
             ```
         """
-        model_config = ConfigDict(extra='forbid')
+        model_config = ConfigDict(extra="forbid")
 
-        thinking_token_budget: Optional[int] = Field(
-            default=None,
-            description="The thinking budget in tokens for the profile",
-            ge=1024,
-        )
+        thinking_token_budget: Optional[int] = Field(default=None, description="The thinking budget in tokens for the profile", ge=1024)
+
 
 class OpenRouterLanguageModel(BaseModel):
     """Configuration for OpenRouter language models.
 
     This class defines the configuration settings for OpenRouter language models,
-    including model selection and rate limiting parameters.
+    including model selection and rate limiting parameters. When fetching available models from OpenRouter, results
+    will be filtered to only include models from providers that are not in the user’s ignored providers list and are either
+    in the user’s allowed providers list (if configured) or from any provider (if no allowed providers are specified).
     """
-    model_name: str = Field(..., description="The name of the OpenRouter model to use, typically `{provider}/{model_name}`")
+
+    model_name: str = Field(...,description="The name of the OpenRouter model to use, typically `{provider}/{model_name}`")
     profiles: Optional[dict[str, Profile]] = Field(default=None, description=profiles_desc)
     default_profile: Optional[str] = Field(default=None, description=default_profiles_desc)
 
@@ -660,15 +668,33 @@ class OpenRouterLanguageModel(BaseModel):
             max_prompt_price: Maximum prompt price per 1M tokens.
             max_completion_price: Maximum completion price per 1M tokens.
         """
-        model_config = ConfigDict(extra='forbid')
+        model_config = ConfigDict(extra="forbid")
 
-        sort: Optional[ProviderSort] = Field(default=None, description="Sort providers by preference")
-        quantizations: Optional[list[ModelQuantization]] = Field(default=None, description="Allowed model quantizations (e.g. ['fp16', 'fp8'])")
-        data_collection: Optional[DataCollection] = Field(default=None, description="Data collection preference. `allow`: allows the use of providers which store user data non-transiently and may train on it. `deny`: use only providers which do not collect/store user data.")
-        only: Optional[list[str]] = Field(default=None, description="Only include these providers when performing provider routing")
-        ignore: Optional[list[str]] = Field(default=None, description="Exclude these providers when performing provider routing")
-        max_prompt_price: Optional[float] = Field(default=None, description="Maximum prompt price per 1M tokens.")
-        max_completion_price: Optional[float] = Field(default=None, description="Maximum completion price per 1M tokens.")
+        sort: Optional[ProviderSort] = Field(
+            default=None, description="Sort providers by preference"
+        )
+        quantizations: Optional[list[ModelQuantization]] = Field(
+            default=None,
+            description="Allowed model quantizations (e.g. ['fp16', 'fp8'])",
+        )
+        data_collection: Optional[DataCollection] = Field(
+            default=None,
+            description="Data collection preference. `allow`: allows the use of providers which store user data non-transiently and may train on it. `deny`: use only providers which do not collect/store user data.",
+        )
+        only: Optional[list[str]] = Field(
+            default=None,
+            description="Only include these providers when performing provider routing",
+        )
+        ignore: Optional[list[str]] = Field(
+            default=None,
+            description="Exclude these providers when performing provider routing",
+        )
+        max_prompt_price: Optional[float] = Field(
+            default=None, description="Maximum prompt price per 1M tokens."
+        )
+        max_completion_price: Optional[float] = Field(
+            default=None, description="Maximum completion price per 1M tokens."
+        )
 
     class Profile(BaseModel):
         """Profile configurations for OpenRouter language models.
@@ -678,12 +704,25 @@ class OpenRouterLanguageModel(BaseModel):
         - provider: provider routing preferences
         - reasoning_effort / reasoning_max_tokens: reasoning config (OpenRouter fields)
         """
-        model_config = ConfigDict(extra='forbid')
+        model_config = ConfigDict(extra="forbid")
 
-        reasoning_effort: Optional[Literal["high", "medium", "low"]] = Field(default=None, description="OpenAI-style reasoning effort")
-        reasoning_max_tokens: Optional[int] = Field(default=None, gt=0, description="Non-OpenAI-style reasoning effort (max tokens)")
-        models: Optional[list[str]] = Field(default=None, description="Alternate models to fall back to if the primary model is not available", max_length=3)
-        provider: Optional[OpenRouterLanguageModel.Provider] = Field(default=None, description="Provider routing configuration")
+        reasoning_effort: Optional[Literal["high", "medium", "low"]] = Field(
+            default=None, description="OpenAI-style reasoning effort"
+        )
+        reasoning_max_tokens: Optional[int] = Field(
+            default=None,
+            gt=0,
+            description="Non-OpenAI-style reasoning effort (max tokens)",
+        )
+        models: Optional[list[str]] = Field(
+            default=None,
+            description="Alternate models to fall back to if the primary model is not available",
+            max_length=3,
+        )
+        provider: Optional[OpenRouterLanguageModel.Provider] = Field(
+            default=None, description="Provider routing configuration"
+        )
+
 
 CohereEmbeddingTaskType = Literal[
     "search_document",
@@ -691,6 +730,7 @@ CohereEmbeddingTaskType = Literal[
     "classification",
     "clustering",
 ]
+
 
 class CohereEmbeddingModel(BaseModel):
     """Configuration for Cohere embedding models.
@@ -758,14 +798,28 @@ class CohereEmbeddingModel(BaseModel):
             profile = CohereEmbeddingModel.Profile()
             ```
         """
-        model_config = ConfigDict(extra='forbid')
+
+        model_config = ConfigDict(extra="forbid")
 
         output_dimensionality: Optional[int] = Field(default=None, gt=0, le=1536, description="Dimensionality of the embedding created by this model")
         input_type: CohereEmbeddingTaskType = Field(default="search_document", description="Type of input")
 
-EmbeddingModel = Union[OpenAIEmbeddingModel, GoogleVertexEmbeddingModel, GoogleDeveloperEmbeddingModel, CohereEmbeddingModel]
-LanguageModel = Union[OpenAILanguageModel, AnthropicLanguageModel, GoogleDeveloperLanguageModel, GoogleVertexLanguageModel, OpenRouterLanguageModel]
+
+EmbeddingModel = Union[
+    OpenAIEmbeddingModel,
+    GoogleVertexEmbeddingModel,
+    GoogleDeveloperEmbeddingModel,
+    CohereEmbeddingModel,
+]
+LanguageModel = Union[
+    OpenAILanguageModel,
+    AnthropicLanguageModel,
+    GoogleDeveloperLanguageModel,
+    GoogleVertexLanguageModel,
+    OpenRouterLanguageModel,
+]
 ModelConfig = Union[EmbeddingModel, LanguageModel]
+
 
 class SemanticConfig(BaseModel):
     """Configuration for semantic language and embedding models.
@@ -865,6 +919,7 @@ class SemanticConfig(BaseModel):
         )
         ```
     """
+
     language_models: Optional[dict[str, LanguageModel]] = None
     default_language_model: Optional[str] = None
     embedding_models: Optional[dict[str, EmbeddingModel]] = None
@@ -895,12 +950,12 @@ class SemanticConfig(BaseModel):
                 self.default_embedding_model = list(self.embedding_models.keys())[0]
             # Set default profile for each model if not set and only one preset exists
             for model_config in self.embedding_models.values():
-                if hasattr(model_config, "profiles") and model_config.profiles is not None:
+                if (
+                    hasattr(model_config, "profiles")
+                    and model_config.profiles is not None
+                ):
                     preset_names = list(model_config.profiles.keys())
-                    if (
-                        model_config.default_profile is None
-                        and len(preset_names) == 1
-                    ):
+                    if model_config.default_profile is None and len(preset_names) == 1:
                         model_config.default_profile = preset_names[0]
 
     @model_validator(mode="after")
@@ -925,72 +980,114 @@ class SemanticConfig(BaseModel):
             available_language_model_aliases = list(self.language_models.keys())
             if self.default_language_model is None and len(self.language_models) > 1:
                 raise ConfigurationError(
-                    f"default_language_model is not set, and multiple language models are configured. Please specify one of: {available_language_model_aliases} as a default_language_model.")
+                    f"default_language_model is not set, and multiple language models are configured. Please specify one of: {available_language_model_aliases} as a default_language_model."
+                )
 
-            if self.default_language_model is not None and self.default_language_model not in self.language_models:
+            if (
+                self.default_language_model is not None
+                and self.default_language_model not in self.language_models
+            ):
                 raise ConfigurationError(
-                    f"default_language_model {self.default_language_model} is not in configured map of language models. Available models: {available_language_model_aliases} .")
+                    f"default_language_model {self.default_language_model} is not in configured map of language models. Available models: {available_language_model_aliases} ."
+                )
 
             for model_alias, language_model in self.language_models.items():
                 language_model_name = language_model.model_name
-                language_model_provider = _get_model_provider_for_model_config(language_model)
-                if language_model_provider == ModelProvider.OPENROUTER:
-                    _ = OpenRouterModelProvider()
-                completion_model_params = model_catalog.get_completion_model_parameters(language_model_provider,
-                                                                                 language_model_name)
+                language_model_provider = _get_model_provider_for_model_config(
+                    language_model
+                )
+                completion_model_params = model_catalog.get_completion_model_parameters(
+                    language_model_provider, language_model_name
+                )
                 if completion_model_params is None:
                     raise ConfigurationError(
                         model_catalog.generate_unsupported_completion_model_error_message(
-                            language_model_provider,
-                            language_model_name
+                            language_model_provider, language_model_name
                         )
                     )
                 if language_model.profiles is not None:
                     if not completion_model_params.supports_profiles:
                         raise ConfigurationError(
-                            f"Model '{model_alias}' does not support parameter profiles. Please remove the Profile configuration.")
+                            f"Model '{model_alias}' does not support parameter profiles. Please remove the Profile configuration."
+                        )
                     profile_names = list(language_model.profiles.keys())
-                    if language_model.default_profile is None and len(profile_names) > 0:
+                    if (
+                        language_model.default_profile is None
+                        and len(profile_names) > 0
+                    ):
                         raise ConfigurationError(
-                            f"default_profile is not set for model {model_alias}, but multiple profiles are configured. Please specify one of: {profile_names} as a default_profile.")
-                    if language_model.default_profile is not None and language_model.default_profile not in profile_names:
+                            f"default_profile is not set for model {model_alias}, but multiple profiles are configured. Please specify one of: {profile_names} as a default_profile."
+                        )
+                    if (
+                        language_model.default_profile is not None
+                        and language_model.default_profile not in profile_names
+                    ):
                         raise ConfigurationError(
-                            f"default_profile {language_model.default_profile} is not in configured profiles for model {model_alias}. Available profiles: {profile_names}")
+                            f"default_profile {language_model.default_profile} is not in configured profiles for model {model_alias}. Available profiles: {profile_names}"
+                        )
                     for profile_alias, profile in language_model.profiles.items():
-                        _validate_language_profile(language_model, model_alias, completion_model_params, profile, profile_alias)
-
+                        _validate_language_profile(
+                            language_model,
+                            model_alias,
+                            completion_model_params,
+                            profile,
+                            profile_alias,
+                        )
 
         if self.embedding_models is not None:
             available_embedding_model_aliases = list(self.embedding_models.keys())
             if self.default_embedding_model is None and len(self.embedding_models) > 1:
                 raise ConfigurationError(
-                    f"default_embedding_model is not set, and multiple embedding models are configured. Please specify one of: {available_embedding_model_aliases} as a default_embedding_model.")
+                    f"default_embedding_model is not set, and multiple embedding models are configured. Please specify one of: {available_embedding_model_aliases} as a default_embedding_model."
+                )
 
-            if self.default_embedding_model is not None and self.default_embedding_model not in self.embedding_models:
+            if (
+                self.default_embedding_model is not None
+                and self.default_embedding_model not in self.embedding_models
+            ):
                 raise ConfigurationError(
-                    f"default_embedding_model {self.default_embedding_model} is not in configured map of embedding models. Available models: {available_embedding_model_aliases} .")
+                    f"default_embedding_model {self.default_embedding_model} is not in configured map of embedding models. Available models: {available_embedding_model_aliases} ."
+                )
             for model_alias, embedding_model in self.embedding_models.items():
-                embedding_model_provider = _get_model_provider_for_model_config(embedding_model)
+                embedding_model_provider = _get_model_provider_for_model_config(
+                    embedding_model
+                )
                 embedding_model_name = embedding_model.model_name
-                embedding_model_parameters = model_catalog.get_embedding_model_parameters(embedding_model_provider,
-                                                                                          embedding_model_name)
+                embedding_model_parameters = (
+                    model_catalog.get_embedding_model_parameters(
+                        embedding_model_provider, embedding_model_name
+                    )
+                )
                 if embedding_model_parameters is None:
-                    raise ConfigurationError(model_catalog.generate_unsupported_embedding_model_error_message(
-                        embedding_model_provider,
-                        embedding_model_name
-                    ))
+                    raise ConfigurationError(
+                        model_catalog.generate_unsupported_embedding_model_error_message(
+                            embedding_model_provider, embedding_model_name
+                        )
+                    )
                 if hasattr(embedding_model, "profiles") and embedding_model.profiles:
                     profile_names = list(embedding_model.profiles.keys())
-                    if embedding_model.default_profile is None and len(profile_names) > 0:
+                    if (
+                        embedding_model.default_profile is None
+                        and len(profile_names) > 0
+                    ):
                         raise ConfigurationError(
-                            f"default_profile is not set for model {model_alias}, but multiple profiles are configured. Please specify one of: {profile_names} as a default_profile.")
-                    if embedding_model.default_profile is not None and embedding_model.default_profile not in profile_names:
+                            f"default_profile is not set for model {model_alias}, but multiple profiles are configured. Please specify one of: {profile_names} as a default_profile."
+                        )
+                    if (
+                        embedding_model.default_profile is not None
+                        and embedding_model.default_profile not in profile_names
+                    ):
                         raise ConfigurationError(
-                            f"default_profile {embedding_model.default_profile} is not in configured profiles for model {model_alias}. Available profiles: {profile_names}")
+                            f"default_profile {embedding_model.default_profile} is not in configured profiles for model {model_alias}. Available profiles: {profile_names}"
+                        )
 
                     for profile_alias, profile in embedding_model.profiles.items():
-                        _validate_embedding_profile(embedding_model_parameters, model_alias, profile_alias, profile)
-
+                        _validate_embedding_profile(
+                            embedding_model_parameters,
+                            model_alias,
+                            profile_alias,
+                            profile,
+                        )
 
         return self
 
@@ -1007,6 +1104,7 @@ class CloudExecutorSize(str, Enum):
         LARGE: Large instance size.
         XLARGE: Extra large instance size.
     """
+
     SMALL = "INSTANCE_SIZE_S"
     MEDIUM = "INSTANCE_SIZE_M"
     LARGE = "INSTANCE_SIZE_L"
@@ -1036,6 +1134,7 @@ class CloudConfig(BaseModel):
         config = CloudConfig()
         ```
     """
+
     size: Optional[CloudExecutorSize] = None
 
 
@@ -1109,6 +1208,7 @@ class SessionConfig(BaseModel):
         )
         ```
     """
+
     app_name: str = "default_app"
     db_path: Optional[Path] = None
     semantic: Optional[SemanticConfig] = None
@@ -1127,22 +1227,37 @@ class SessionConfig(BaseModel):
                     tpm=model.tpm,
                 )
             elif isinstance(model, OpenAILanguageModel):
-                profiles = {
-                    profile: ResolvedOpenAIModelProfile(reasoning_effort=profile_config.reasoning_effort, verbosity=profile_config.verbosity) for
-                    profile, profile_config in model.profiles.items()
-                } if model.profiles else None
+                profiles = (
+                    {
+                        profile: ResolvedOpenAIModelProfile(
+                            reasoning_effort=profile_config.reasoning_effort,
+                            verbosity=profile_config.verbosity,
+                        )
+                        for profile, profile_config in model.profiles.items()
+                    }
+                    if model.profiles
+                    else None
+                )
                 return ResolvedOpenAIModelConfig(
                     model_name=model.model_name,
                     rpm=model.rpm,
                     tpm=model.tpm,
                     profiles=profiles,
-                    default_profile=model.default_profile
+                    default_profile=model.default_profile,
                 )
-            elif isinstance(model, (GoogleDeveloperLanguageModel, GoogleVertexLanguageModel)):
-                profiles = {
-                    profile: ResolvedGoogleModelProfile(thinking_token_budget=profile_config.thinking_token_budget) for
-                    profile, profile_config in model.profiles.items()
-                } if model.profiles else None
+            elif isinstance(
+                model, (GoogleDeveloperLanguageModel, GoogleVertexLanguageModel)
+            ):
+                profiles = (
+                    {
+                        profile: ResolvedGoogleModelProfile(
+                            thinking_token_budget=profile_config.thinking_token_budget
+                        )
+                        for profile, profile_config in model.profiles.items()
+                    }
+                    if model.profiles
+                    else None
+                )
                 return ResolvedGoogleModelConfig(
                     model_name=model.model_name,
                     model_provider=_get_model_provider_for_model_config(model),
@@ -1151,14 +1266,20 @@ class SessionConfig(BaseModel):
                     profiles=profiles,
                     default_profile=model.default_profile,
                 )
-            elif isinstance(model, (GoogleDeveloperEmbeddingModel, GoogleVertexEmbeddingModel)):
-                resolved_profiles = {
-                    profile_name: ResolvedGoogleModelProfile(
-                        embedding_dimensionality=profile.output_dimensionality,
-                        embedding_task_type=profile.task_type,
-                    ) for
-                    profile_name, profile in model.profiles.items()
-                } if model.profiles else None
+            elif isinstance(
+                model, (GoogleDeveloperEmbeddingModel, GoogleVertexEmbeddingModel)
+            ):
+                resolved_profiles = (
+                    {
+                        profile_name: ResolvedGoogleModelProfile(
+                            embedding_dimensionality=profile.output_dimensionality,
+                            embedding_task_type=profile.task_type,
+                        )
+                        for profile_name, profile in model.profiles.items()
+                    }
+                    if model.profiles
+                    else None
+                )
                 return ResolvedGoogleModelConfig(
                     model_name=model.model_name,
                     model_provider=model.model_provider,
@@ -1168,43 +1289,63 @@ class SessionConfig(BaseModel):
                     default_profile=model.default_profile,
                 )
             elif isinstance(model, AnthropicLanguageModel):
-                profiles = {
-                    profile: ResolvedAnthropicModelProfile(thinking_token_budget=profile_config.thinking_token_budget) for
-                    profile, profile_config in model.profiles.items()
-                } if model.profiles else None
+                profiles = (
+                    {
+                        profile: ResolvedAnthropicModelProfile(
+                            thinking_token_budget=profile_config.thinking_token_budget
+                        )
+                        for profile, profile_config in model.profiles.items()
+                    }
+                    if model.profiles
+                    else None
+                )
                 return ResolvedAnthropicModelConfig(
                     model_name=model.model_name,
                     rpm=model.rpm,
                     input_tpm=model.input_tpm,
                     output_tpm=model.output_tpm,
                     profiles=profiles,
-                    default_profile=model.default_profile
+                    default_profile=model.default_profile,
                 )
             elif isinstance(model, CohereEmbeddingModel):
-                profiles = {
-                    profile: ResolvedCohereModelProfile(output_dimensionality=profile.output_dimensionality, input_type=profile.input_type) for
-                    profile, profile_config in model.profiles.items()
-                } if model.profiles else None
+                profiles = (
+                    {
+                        profile: ResolvedCohereModelProfile(
+                            output_dimensionality=profile.output_dimensionality,
+                            input_type=profile.input_type,
+                        )
+                        for profile, profile_config in model.profiles.items()
+                    }
+                    if model.profiles
+                    else None
+                )
                 return ResolvedCohereModelConfig(
                     model_name=model.model_name,
                     rpm=model.rpm,
                     tpm=model.tpm,
                     profiles=profiles,
-                    default_profile=model.default_profile
+                    default_profile=model.default_profile,
                 )
             elif isinstance(model, OpenRouterLanguageModel):
-                profiles = {
-                    profile: ResolvedOpenRouterModelProfile(
-                        reasoning_effort=profile_config.reasoning_effort,
-                        reasoning_max_tokens=profile_config.reasoning_max_tokens,
-                        models=profile_config.models,
-                        provider=(
-                            ResolvedOpenRouterProviderRouting(**(profile_config.provider.model_dump()))
-                            if profile_config.provider is not None
-                            else None
-                        ),
-                    ) for profile, profile_config in model.profiles.items()
-                } if model.profiles else None
+                profiles = (
+                    {
+                        profile: ResolvedOpenRouterModelProfile(
+                            reasoning_effort=profile_config.reasoning_effort,
+                            reasoning_max_tokens=profile_config.reasoning_max_tokens,
+                            models=profile_config.models,
+                            provider=(
+                                ResolvedOpenRouterProviderRouting(
+                                    **(profile_config.provider.model_dump())
+                                )
+                                if profile_config.provider is not None
+                                else None
+                            ),
+                        )
+                        for profile, profile_config in model.profiles.items()
+                    }
+                    if model.profiles
+                    else None
+                )
                 return ResolvedOpenRouterModelConfig(
                     model_name=model.model_name,
                     profiles=profiles,
@@ -1215,18 +1356,26 @@ class SessionConfig(BaseModel):
 
         language_models = (
             ResolvedLanguageModelConfig(
-                model_configs={alias: resolve_model(cfg) for alias, cfg in self.semantic.language_models.items()},
+                model_configs={
+                    alias: resolve_model(cfg)
+                    for alias, cfg in self.semantic.language_models.items()
+                },
                 default_model=self.semantic.default_language_model,
             )
-            if self.semantic and self.semantic.language_models else None
+            if self.semantic and self.semantic.language_models
+            else None
         )
 
         embedding_models = (
             ResolvedEmbeddingModelConfig(
-                model_configs={alias: resolve_model(cfg) for alias, cfg in self.semantic.embedding_models.items()},
+                model_configs={
+                    alias: resolve_model(cfg)
+                    for alias, cfg in self.semantic.embedding_models.items()
+                },
                 default_model=self.semantic.default_embedding_model,
             )
-            if self.semantic and self.semantic.embedding_models else None
+            if self.semantic and self.semantic.embedding_models
+            else None
         )
 
         resolved_semantic = ResolvedSemanticConfig(
@@ -1235,52 +1384,93 @@ class SessionConfig(BaseModel):
         )
 
         resolved_cloud = (
-            ResolvedCloudConfig(size=self.cloud.size)
-            if self.cloud else None
+            ResolvedCloudConfig(size=self.cloud.size) if self.cloud else None
         )
 
         return ResolvedSessionConfig(
             app_name=self.app_name,
             db_path=self.db_path,
             semantic=resolved_semantic,
-            cloud=resolved_cloud
+            cloud=resolved_cloud,
         )
 
-def _validate_language_profile(language_model: LanguageModel, model_alias: str, completion_model_params: CompletionModelParameters, profile:Any, profile_alias: str) -> None:
+
+def _validate_language_profile(
+    language_model: LanguageModel,
+    model_alias: str,
+    completion_model_params: CompletionModelParameters,
+    profile: Any,
+    profile_alias: str,
+) -> None:
     """Validate the language profile against the language model."""
     if isinstance(language_model, OpenAILanguageModel):
-        if not completion_model_params.supports_minimal_reasoning and profile.reasoning_effort == "minimal":
-            raise ConfigurationError(f"Model '{model_alias}' does not support 'minimal' reasoning. Please set reasoning_effort on '{profile_alias}' to 'low', 'medium', or 'high' instead.")
-        if not completion_model_params.supports_verbosity and profile.verbosity is not None:
-            raise ConfigurationError(f"Model '{model_alias}' does not support verbosity. Please remove verbosity from '{profile_alias}'.")
-    elif isinstance(language_model, GoogleDeveloperLanguageModel) or isinstance(language_model, GoogleVertexLanguageModel):
-        if not profile.thinking_token_budget or profile.thinking_token_budget == 0 and model_alias == "gemini-2.5-pro":
-            raise ConfigurationError(f"Model '{model_alias}' does not support disabling reasoning. Please set thinking_token_budget on '{profile_alias}' to a non-zero value.")
+        if (
+            not completion_model_params.supports_minimal_reasoning
+            and profile.reasoning_effort == "minimal"
+        ):
+            raise ConfigurationError(
+                f"Model '{model_alias}' does not support 'minimal' reasoning. Please set reasoning_effort on '{profile_alias}' to 'low', 'medium', or 'high' instead."
+            )
+        if (
+            not completion_model_params.supports_verbosity
+            and profile.verbosity is not None
+        ):
+            raise ConfigurationError(
+                f"Model '{model_alias}' does not support verbosity. Please remove verbosity from '{profile_alias}'."
+            )
+    elif isinstance(language_model, GoogleDeveloperLanguageModel) or isinstance(
+        language_model, GoogleVertexLanguageModel
+    ):
+        if (
+            not profile.thinking_token_budget
+            or profile.thinking_token_budget == 0
+            and model_alias == "gemini-2.5-pro"
+        ):
+            raise ConfigurationError(
+                f"Model '{model_alias}' does not support disabling reasoning. Please set thinking_token_budget on '{profile_alias}' to a non-zero value."
+            )
     elif isinstance(language_model, OpenRouterLanguageModel):
         # For OpenRouter, validate pass-through parameters against capabilities
-        if (profile.reasoning_effort or profile.reasoning_max_tokens) and not completion_model_params.supports_reasoning:
-            raise ConfigurationError(f"Model '{model_alias}' does not support reasoning. Remove 'reasoning' from '{profile_alias}'.")
+        if (
+            profile.reasoning_effort or profile.reasoning_max_tokens
+        ) and not completion_model_params.supports_reasoning:
+            raise ConfigurationError(
+                f"Model '{model_alias}' does not support reasoning. Remove 'reasoning' from '{profile_alias}'."
+            )
+
 
 def _validate_embedding_profile(
     embedding_model_parameters: EmbeddingModelParameters,
     model_alias: str,
     profile_alias: str,
-    profile: EmbeddingModel.Profile
+    profile: EmbeddingModel.Profile,
 ):
     """Validate Embedding profile against embedding model parameters."""
-    if hasattr(profile, "output_dimensionality") and profile.output_dimensionality is not None and not embedding_model_parameters.supports_dimensions(profile.output_dimensionality):
+    if (
+        hasattr(profile, "output_dimensionality")
+        and profile.output_dimensionality is not None
+        and not embedding_model_parameters.supports_dimensions(
+            profile.output_dimensionality
+        )
+    ):
         raise ConfigurationError(
             f"The dimensionality of the Embeddings model profile {profile_alias} is invalid. "
             f"Requested dimensionality: {profile.output_dimensionality}. "
-            f"Available Options: {embedding_model_parameters.get_possible_dimensions()}")
+            f"Available Options: {embedding_model_parameters.get_possible_dimensions()}"
+        )
+
 
 def _get_model_provider_for_model_config(model_config: ModelConfig) -> ModelProvider:
     """Determine the ModelProvider for the given model configuration."""
     if isinstance(model_config, (OpenAILanguageModel, OpenAIEmbeddingModel)):
         return ModelProvider.OPENAI
-    elif isinstance(model_config, (GoogleDeveloperLanguageModel, GoogleDeveloperEmbeddingModel)):
+    elif isinstance(
+        model_config, (GoogleDeveloperLanguageModel, GoogleDeveloperEmbeddingModel)
+    ):
         return ModelProvider.GOOGLE_DEVELOPER
-    elif isinstance(model_config, (GoogleVertexLanguageModel, GoogleVertexEmbeddingModel)):
+    elif isinstance(
+        model_config, (GoogleVertexLanguageModel, GoogleVertexEmbeddingModel)
+    ):
         return ModelProvider.GOOGLE_VERTEX
     elif isinstance(model_config, AnthropicLanguageModel):
         return ModelProvider.ANTHROPIC
@@ -1288,5 +1478,5 @@ def _get_model_provider_for_model_config(model_config: ModelConfig) -> ModelProv
         return ModelProvider.COHERE
     elif isinstance(model_config, OpenRouterLanguageModel):
         return ModelProvider.OPENROUTER
-    else :
+    else:
         raise InternalError(f"Unknown model type: {type(model_config)}")
