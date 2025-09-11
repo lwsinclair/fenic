@@ -23,6 +23,7 @@ from fenic.core.types import (
     DataLikeType,
     DatasetMetadata,
     DataType,
+    DateType,
     DocumentPathType,
     DoubleType,
     EmbeddingType,
@@ -46,6 +47,7 @@ from fenic.core.types import (
     StringType,
     StructField,
     StructType,
+    TimestampType,
     TranscriptType,
 )
 
@@ -55,6 +57,7 @@ __all__ = [
     "BooleanType",
     "BranchSide",
     "DataType",
+    "DateType",
     "DocumentPathType",
     "DoubleType",
     "EmbeddingType",
@@ -66,6 +69,7 @@ __all__ = [
     "StringType",
     "StructField",
     "StructType",
+    "TimestampType",
     "TranscriptType",
     "ColumnField",
     "Schema",

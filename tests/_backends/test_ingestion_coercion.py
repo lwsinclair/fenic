@@ -6,7 +6,7 @@ from fenic._backends.local.physical_plan.utils import apply_ingestion_coercions
 
 
 def test_simple_date_coercion():
-    """Date column should be converted to string."""
+    """Date column should not beconverted to string."""
     df = pl.DataFrame({
         "date_col": [date(2023, 12, 25), date(2024, 1, 1)],
         "int_col": [1, 2]
@@ -15,24 +15,24 @@ def test_simple_date_coercion():
     result = apply_ingestion_coercions(df)
 
     # Check that date_col is now string type
-    assert result.schema["date_col"] == pl.String
+    assert result.schema["date_col"] == pl.Date
     assert result.schema["int_col"] == pl.Int64  # unchanged
 
     # Check actual values are string representations
     date_values = result["date_col"].to_list()
-    assert all(isinstance(val, str) for val in date_values)
+    assert all(isinstance(val, date) for val in date_values)
 
 def test_simple_datetime_coercion():
-    """Datetime column should be converted to string."""
+    """Datetime column should not be converted to string."""
     df = pl.DataFrame({
         "datetime_col": [datetime(2023, 12, 25, 14, 30), datetime(2024, 1, 1, 9, 15)],
     })
 
     result = apply_ingestion_coercions(df)
 
-    assert result.schema["datetime_col"] == pl.String
+    assert result.schema["datetime_col"] == pl.Datetime
     datetime_values = result["datetime_col"].to_list()
-    assert all(isinstance(val, str) for val in datetime_values)
+    assert all(isinstance(val, datetime) for val in datetime_values)
 
 def test_array_coercion():
     """Array column should be converted to List."""
@@ -45,7 +45,7 @@ def test_array_coercion():
     assert result.schema["array_col"] == pl.List(pl.Int64)
 
 def test_array_of_dates_coercion():
-    """Array of dates should become List of strings."""
+    """Array of dates should become List of dates."""
     df = pl.DataFrame({
         "date_array": [
             [date(2023, 12, 25), date(2023, 12, 26)],
@@ -55,10 +55,10 @@ def test_array_of_dates_coercion():
 
     result = apply_ingestion_coercions(df)
 
-    assert result.schema["date_array"] == pl.List(pl.String)
+    assert result.schema["date_array"] == pl.List(pl.Date)
 
 def test_struct_coercion():
-    """Struct with date fields should have those fields converted to strings."""
+    """Struct with date fields should not have those fields converted."""
     df = pl.DataFrame({
         "struct_col": [
             {"id": 1, "created_at": date(2023, 12, 25)},
@@ -70,7 +70,7 @@ def test_struct_coercion():
 
     expected_struct_type = pl.Struct([
         pl.Field("id", pl.Int64),
-        pl.Field("created_at", pl.String)
+        pl.Field("created_at", pl.Date)
     ])
     assert result.schema["struct_col"] == expected_struct_type
 
@@ -102,7 +102,7 @@ def test_mixed_columns():
 
     result = apply_ingestion_coercions(df)
 
-    assert result.schema["date_col"] == pl.String      # coerced
+    assert result.schema["date_col"] == pl.Date      # unchanged
     assert result.schema["int_col"] == pl.Int64        # unchanged
     assert result.schema["array_col"] == pl.List(pl.Int64)  # coerced
 
@@ -130,7 +130,7 @@ def test_deeply_nested_structure():
 
     # Check the deeply nested coercion: Array(Date) -> List(String)
     expected_schema = pl.List(pl.Struct([
-        pl.Field("timestamps", pl.List(pl.String)),
+        pl.Field("timestamps", pl.List(pl.Date)),
         pl.Field("count", pl.Int64)
     ]))
 
@@ -140,4 +140,4 @@ def test_deeply_nested_structure():
     events_data = result["events"].to_list()
     first_event = events_data[0][0]  # First event in first row
     assert isinstance(first_event["timestamps"], list)
-    assert all(isinstance(ts, str) for ts in first_event["timestamps"])
+    assert all(isinstance(ts, date) for ts in first_event["timestamps"])

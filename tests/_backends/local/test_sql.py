@@ -7,6 +7,7 @@ import pytest
 from fenic import (
     ArrayType,
     ColumnField,
+    DateType,
     EmbeddingType,
     FloatType,
     IntegerType,
@@ -129,7 +130,7 @@ def test_sql_union(local_session_config):
     expected = pl.DataFrame({"id": [1, 1, 2, 2], "name1": ["Alice", "Alice", "Bob", "Bob"]})
     assert df.equals(expected)
 
-def test_sql_coerce_datetype(local_session_config):
+def test_sql_datetype(local_session_config):
     session = Session.get_or_create(local_session_config)
     df = session.create_dataframe(pl.DataFrame({
         "id": [1, 2],
@@ -146,11 +147,10 @@ def test_sql_coerce_datetype(local_session_config):
         ORDER BY id
     """, df1=df)
 
-    # Should be coerced back to string and list in fenic schema
     assert df.schema.column_fields == [
         ColumnField("id", IntegerType),
-        ColumnField("parsed_date", StringType),  # Date coerced back to string
-        ColumnField("date_array", ArrayType(StringType)),
+        ColumnField("parsed_date", DateType),  # Date coerced back to string
+        ColumnField("date_array", ArrayType(DateType)),
         ColumnField("embeddings", ArrayType(FloatType)),
     ]
 
@@ -158,8 +158,8 @@ def test_sql_coerce_datetype(local_session_config):
     df = df.to_polars()
     expected = pl.DataFrame({
         "id": [1, 2],
-        "parsed_date": ["2023-12-25", "2024-01-01"],
-        "date_array": [["2023-12-25", "2024-01-01"], ["2024-01-02", "2024-01-03"]],
+        "parsed_date": [date(2023, 12, 25), date(2024, 1, 1)],
+        "date_array": [[date(2023, 12, 25), date(2024, 1, 1)], [date(2024, 1, 2), date(2024, 1, 3)]],
         "embeddings": [[1.0, 2.0], [3.0, 4.0]]
     })
     assert df.equals(expected)

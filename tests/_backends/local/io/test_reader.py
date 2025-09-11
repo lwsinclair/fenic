@@ -1,3 +1,4 @@
+import datetime
 import os
 from io import StringIO
 from pathlib import Path
@@ -970,16 +971,16 @@ Francis
 
 
 def test_ingest_date_type(local_session, temp_dir):
-    """Test automatic conversion of date columns to strings.
+    """Test ingestion of date columns.
 
     This tests:
-    - Date column representation as strings
-    - Filtering on date string values
+    - Filtering on date values
     - Consistency across read methods (parquet vs in-memory)
     """
     PARQUET_FILE_NAME = f"{temp_dir.path}/test.parquet"
     DATE_COLUMN_NAME = "some_date"
     CSV_FILE_NAME = f"{temp_dir.path}/test.csv"
+    EXPECTED_DATE = datetime.date(2024, 1, 4)
 
     # Create a dataframe with a date column
     df = pl.DataFrame(
@@ -995,43 +996,43 @@ def test_ingest_date_type(local_session, temp_dir):
 
     # Test 1: Reading from Parquet file
     fenic_df = local_session.read.parquet(PARQUET_FILE_NAME)
-    fenic_df = fenic_df.filter(col(DATE_COLUMN_NAME) == "2024-01-04")
+    fenic_df = fenic_df.filter(col(DATE_COLUMN_NAME) == EXPECTED_DATE)
     result = fenic_df.to_polars()
 
     # Verify schema and type conversion
     expected_schema = pl.Schema(
-        {"month": pl.Int64, "day": pl.Int64, DATE_COLUMN_NAME: pl.String}
+        {"month": pl.Int64, "day": pl.Int64, DATE_COLUMN_NAME: pl.Date}
     )
-    assert result.schema == expected_schema, "Date should be converted to String"
-    assert result[DATE_COLUMN_NAME].to_list() == ["2024-01-04"]
+    assert result.schema == expected_schema
+    assert result[DATE_COLUMN_NAME].to_list() == [EXPECTED_DATE]
 
     # Test 2: Using in-memory dataframe
     fenic_df = local_session.create_dataframe(polars_df)
-    fenic_df = fenic_df.filter(col(DATE_COLUMN_NAME) == "2024-01-04")
+    fenic_df = fenic_df.filter(col(DATE_COLUMN_NAME) == EXPECTED_DATE)
     result = fenic_df.to_polars()
+    assert result.schema == expected_schema
+    assert result[DATE_COLUMN_NAME].to_list() == [EXPECTED_DATE]
 
     # Test 3: CSV file
     polars_df.write_csv(CSV_FILE_NAME)
     fenic_df = local_session.read.csv(CSV_FILE_NAME)
-    fenic_df = fenic_df.filter(col(DATE_COLUMN_NAME) == "2024-01-04")
+    fenic_df = fenic_df.filter(col(DATE_COLUMN_NAME) == EXPECTED_DATE)
     result = fenic_df.to_polars()
-    assert result[DATE_COLUMN_NAME].to_list() == ["2024-01-04"]
-
-    assert result.schema == expected_schema, "Date should be converted to String"
-    assert result[DATE_COLUMN_NAME].to_list() == ["2024-01-04"]
+    assert result.schema == expected_schema
+    assert result[DATE_COLUMN_NAME].to_list() == [EXPECTED_DATE]
 
 
 def test_ingest_datetime_type(local_session, temp_dir):
-    """Test automatic conversion of datetime columns to strings.
+    """Test ingestion of datetime columns.
 
     This tests:
-    - Datetime column representation as strings
-    - Filtering on datetime string values
+    - Filtering on datetime values
     - Consistency across read methods (parquet vs in-memory)
     """
     PARQUET_FILE_NAME = f"{temp_dir.path}/test.parquet"
     DATETIME_COLUMN_NAME = "some_datetime"
     CSV_FILE_NAME = f"{temp_dir.path}/test.csv"
+    EXPECTED_DATETIME = datetime.datetime(2024, 1, 4, 7, 10, 13)
 
     # Create a dataframe with a datetime column
     df = pl.DataFrame(
@@ -1057,9 +1058,7 @@ def test_ingest_datetime_type(local_session, temp_dir):
 
     # Test 1: Reading from Parquet file
     fenic_df = local_session.read.parquet(PARQUET_FILE_NAME)
-    fenic_df = fenic_df.filter(
-        col(DATETIME_COLUMN_NAME) == "2024-01-04 07:10:13.000000"
-    )
+    fenic_df = fenic_df.filter(col(DATETIME_COLUMN_NAME) == EXPECTED_DATETIME)
     result = fenic_df.to_polars()
 
     expected_schema = pl.Schema(
@@ -1069,34 +1068,30 @@ def test_ingest_datetime_type(local_session, temp_dir):
             "hour": pl.Int64,
             "minute": pl.Int64,
             "second": pl.Int64,
-            DATETIME_COLUMN_NAME: pl.String,
+            DATETIME_COLUMN_NAME: pl.Datetime(),
         }
     )
-    assert (
-        result.schema == expected_schema
-    ), "Datetime should be converted to String"
-    assert result[DATETIME_COLUMN_NAME].to_list() == ["2024-01-04 07:10:13.000000"]
+    assert result.schema == expected_schema
+    assert result[DATETIME_COLUMN_NAME].to_list() == [EXPECTED_DATETIME]
 
     # Test 2: Using in-memory dataframe
     fenic_df = local_session.create_dataframe(polars_df)
     fenic_df = fenic_df.filter(
-        col(DATETIME_COLUMN_NAME) == "2024-01-04 07:10:13.000000"
+        col(DATETIME_COLUMN_NAME) == EXPECTED_DATETIME
     )
     result = fenic_df.to_polars()
-
-    assert (
-        result.schema == expected_schema
-    ), "Datetime should be converted to String"
-    assert result[DATETIME_COLUMN_NAME].to_list() == ["2024-01-04 07:10:13.000000"]
+    assert result.schema == expected_schema
+    assert result[DATETIME_COLUMN_NAME].to_list() == [EXPECTED_DATETIME]
 
     # Test 3: CSV file
     write_test_file(CSV_FILE_NAME, polars_df, local_session, "csv")
     fenic_df = local_session.read.csv(CSV_FILE_NAME)
     fenic_df = fenic_df.filter(
-        col(DATETIME_COLUMN_NAME) == "2024-01-04 07:10:13.000000"
+        col(DATETIME_COLUMN_NAME) == EXPECTED_DATETIME
     )
     result = fenic_df.to_polars()
-    assert result[DATETIME_COLUMN_NAME].to_list() == ["2024-01-04 07:10:13.000000"]
+    assert result.schema == expected_schema
+    assert result[DATETIME_COLUMN_NAME].to_list() == [EXPECTED_DATETIME]
 
 def test_ingest_array_type(local_session, temp_dir):
     """Test automatic conversion of array columns to lists."""

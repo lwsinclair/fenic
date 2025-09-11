@@ -75,6 +75,7 @@ from fenic.core import (
     DataLikeType,
     DatasetMetadata,
     DataType,
+    DateType,
     DocumentPathType,
     DoubleType,
     EmbeddingType,
@@ -103,6 +104,7 @@ from fenic.core import (
     StringType,
     StructField,
     StructType,
+    TimestampType,
     ToolParam,
     TranscriptType,
 )
@@ -230,4 +232,7 @@ __all__ = [
     "run_mcp_server_asgi",
     "run_mcp_server_async",
     "run_mcp_server_sync",
+    # Date types
+    "DateType",
+    "TimestampType",
 ]
