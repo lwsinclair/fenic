@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.5.0](https://github.com/typedef-ai/fenic/compare/v0.4.2...v0.5.0) (2025-09-12)
+
+
+### Features
+
+* revert "feat: split reader.docs() into json() and markdown() ([#179](https://github.com/typedef-ai/fenic/issues/179))" ([#195](https://github.com/typedef-ai/fenic/issues/195)) ([8d9f490](https://github.com/typedef-ai/fenic/commit/8d9f4904ea630e7910a80aac40949a416ff23472))
+* split reader.docs() into json() and markdown() ([#179](https://github.com/typedef-ai/fenic/issues/179)) ([083d61a](https://github.com/typedef-ai/fenic/commit/083d61a56fc14979a77831841086c0f2f99781c9))
+* use gemini native token counter ([#197](https://github.com/typedef-ai/fenic/issues/197)) ([2978cd4](https://github.com/typedef-ai/fenic/commit/2978cd46a6f7974cfa1694d1dcafc989901d3f2d))
+
+
+### Bug Fixes
+
+* enforce that return types of all branches in conditional chains are equal and handle child exprs in IsNullExpr ([#190](https://github.com/typedef-ai/fenic/issues/190)) ([bd778e5](https://github.com/typedef-ai/fenic/commit/bd778e50419acceb0e44a3fa1f269e3f0acc2c7d))
+
+
+### Documentation
+
+* fixed pyproject.toml and readme for the mcp example ([#198](https://github.com/typedef-ai/fenic/issues/198)) ([407de03](https://github.com/typedef-ai/fenic/commit/407de0324660c70eee700caab05ebba50d122965))
+* Update index.md in docs ([#205](https://github.com/typedef-ai/fenic/issues/205)) ([883cb30](https://github.com/typedef-ai/fenic/commit/883cb3078ce87e4b6adced2a46630201b6327362))
+* Update README.md ([#204](https://github.com/typedef-ai/fenic/issues/204)) ([0410f89](https://github.com/typedef-ai/fenic/commit/0410f89ee5a6170675a53f7bc6e928dda7a937a9))
+* updated and simplified the docs MCP example ([#193](https://github.com/typedef-ai/fenic/issues/193)) ([623a085](https://github.com/typedef-ai/fenic/commit/623a085247bd83ddf9ff3f237658cb09bb25ea46))
+
 ## [0.4.2](https://github.com/typedef-ai/fenic/compare/v0.4.1...v0.4.2) (2025-09-04)
 
 
