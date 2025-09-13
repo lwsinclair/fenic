@@ -69,6 +69,9 @@ lint:
         - examples/markdown_processing/attention_is_all_you_need.md
         - examples/**/README.md
         - .kiro/**
+    - linters: [ruff]
+      paths:
+        - examples/fenic_in_120_seconds/**
 actions:
   disabled:
     - trunk-upgrade-available
